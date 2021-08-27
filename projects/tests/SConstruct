@@ -1,0 +1,117 @@
+# Copyright (C) 2021 University of Rochester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+
+#
+# Path to the root directory of the repository.
+#
+root = '#/../..'
+
+#
+# Path to our Silhouette compiler.
+#
+clang = root + '/build/llvm/install/bin/clang'
+
+#
+# Path to the newlib install directory.
+#
+newlib = root + '/build/newlib-${CONF_NAME}/install'
+
+#
+# Path to the compiler-rt install directory.
+#
+compiler_rt = root + '/build/compiler-rt-${CONF_NAME}/install'
+
+
+#
+# Construct a baseline environment.
+#
+baseline = Environment(CCFLAGS=[], CPPDEFINES=[], CPPPATH=[], LIBS=[],
+                       LIBPATH=[], LINKFLAGS=[])
+baseline['ENV']['TERM'] = os.environ['TERM'] # Keep colors
+baseline['CONF_NAME'] = 'baseline'
+baseline['PROGPREFIX'] = '${CONF_NAME}-'
+baseline['PROGSUFFIX'] = '.elf'
+baseline['CC'] = File(clang)
+baseline['LINK'] = File(clang)
+baseline.Append(CCFLAGS=[
+    '--target=arm-none-eabi',
+    '-mcpu=cortex-m3',
+    '-mfloat-abi=soft',
+    '-mthumb',
+    '-g',
+    '-Os',
+    '-flto',
+    '-ffunction-sections',
+    '-fdata-sections',
+    '-ffreestanding',
+    '-fomit-frame-pointer',
+    '-Wall',
+    '-Wextra',
+])
+baseline.Append(LINKFLAGS=[
+    '--target=arm-none-eabi',
+    '-mcpu=cortex-m3',
+    '-mfloat-abi=soft',
+    '-mthumb',
+    '-g',
+    '-Os',
+    '-flto',
+    '-fuse-ld=lld',
+    '-Wl,--gc-sections',
+    '-Wall',
+    '-Wextra',
+    '-T' + File('#LinkerScript-${CONF_NAME}.ld').path,
+])
+baseline.Append(LIBS=['c', 'm', 'clang_rt.builtins-arm'])
+baseline.Append(CPPPATH=[
+    Dir(newlib + '/arm-none-eabi/include'),
+])
+baseline.Append(LIBPATH=[
+    Dir(newlib + '/arm-none-eabi/lib'),
+    Dir(compiler_rt + '/lib/baremetal'),
+])
+
+
+#
+# Construct a Silhouette environment.
+#
+silhouette = baseline.Clone()
+silhouette['CONF_NAME'] = 'silhouette'
+silhouette.Append(CPPDEFINES=[
+    'SILHOUETTE',
+    'SILHOUETTE_SS_OFFSET=0x1ffc',
+])
+silhouette.Append(LINKFLAGS=[
+    '-Wl,-mllvm,-enable-arm-silhouette-str2strt',
+    '-Wl,-mllvm,-enable-arm-silhouette-shadowstack',
+    '-Wl,-mllvm,-enable-arm-silhouette-cfi',
+    '-Wl,-mllvm,-arm-silhouette-shadowstack-offset=0x1ffc',
+])
+
+
+#
+# A list of environments.
+#
+environments = [
+    baseline,
+    silhouette,
+]
+
+###############################################################################
+
+for env in environments:
+    SConscript('src/programs.scons', variant_dir='build-' + env['CONF_NAME'],
+               duplicate=False, exports=['env'])
