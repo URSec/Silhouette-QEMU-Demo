@@ -30,6 +30,11 @@ NEWLIB_SRC="$ROOT_DIR/newlib-cygwin"
 ARM_NONE_EABI_GCC_PATH=`dirname $(arm-none-eabi-gcc -print-libgcc-file-name)`
 
 #
+# Path to the LLVM build directory.
+#
+LLVM_BUILD="$ROOT_DIR/build/llvm"
+
+#
 # Path to the LLVM install directory.
 #
 LLVM_INSTALL="$ROOT_DIR/build/llvm/install"
@@ -73,31 +78,31 @@ export LD_FOR_TARGET
 #
 # Path to the archiver to use.
 #
-AR_FOR_TARGET="$LLVM_INSTALL/bin/llvm-ar"
+AR_FOR_TARGET="$LLVM_BUILD/bin/llvm-ar"
 export AR_FOR_TARGET
 
 #
 # Path to the NM tool.
 #
-NM_FOR_TARGET="$LLVM_INSTALL/bin/llvm-nm"
+NM_FOR_TARGET="$LLVM_BUILD/bin/llvm-nm"
 export NM_FOR_TARGET
 
 #
 # Path to the RANLIB tool.
 #
-RANLIB_FOR_TARGET="$LLVM_INSTALL/bin/llvm-ranlib"
+RANLIB_FOR_TARGET="$LLVM_BUILD/bin/llvm-ranlib"
 export RANLIB_FOR_TARGET
 
 #
 # Path to the READELF tool.
 #
-READELF_FOR_TARGET="$LLVM_INSTALL/bin/llvm-readelf"
+READELF_FOR_TARGET="$LLVM_BUILD/bin/llvm-readelf"
 export READELF_FOR_TARGET
 
 #
 # Path to the STRIP tool.
 #
-STRIP_FOR_TARGET="$LLVM_INSTALL/bin/llvm-strip"
+STRIP_FOR_TARGET="$LLVM_BUILD/bin/llvm-strip"
 export STRIP_FOR_TARGET
 
 

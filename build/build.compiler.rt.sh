@@ -25,6 +25,11 @@ ROOT_DIR=`dirname $0 | sed 's/$/\/../' | xargs realpath`
 LLVM_SRC="$ROOT_DIR/llvm-project"
 
 #
+# Path to the LLVM build directory.
+#
+LLVM_BUILD="$ROOT_DIR/build/llvm"
+
+#
 # Path to the LLVM install directory.
 #
 LLVM_INSTALL="$ROOT_DIR/build/llvm/install"
@@ -130,12 +135,12 @@ for conf in ${CONFIGURATIONS[@]}; do
           -DCOMPILER_RT_BUILD_LIBFUZZER=OFF                                \
           -DCOMPILER_RT_BUILD_PROFILE=OFF                                  \
           -DCMAKE_C_COMPILER="$LLVM_INSTALL/bin/clang"                     \
-          -DCMAKE_AR="$LLVM_INSTALL/bin/llvm-ar"                           \
-          -DCMAKE_NM="$LLVM_INSTALL/bin/llvm-nm"                           \
-          -DCMAKE_RANLIB="$LLVM_INSTALL/bin/llvm-ranlib"                   \
+          -DCMAKE_AR="$LLVM_BUILD/bin/llvm-ar"                             \
+          -DCMAKE_NM="$LLVM_BUILD/bin/llvm-nm"                             \
+          -DCMAKE_RANLIB="$LLVM_BUILD/bin/llvm-ranlib"                     \
           -DCOMPILER_RT_BAREMETAL_BUILD=ON                                 \
           -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON                             \
-          -DLLVM_CONFIG_PATH="$LLVM_INSTALL/bin/llvm-config"               \
+          -DLLVM_CONFIG_PATH="$LLVM_BUILD/bin/llvm-config"                 \
           -DCMAKE_C_COMPILER_TARGET="$TARGET"                              \
           -DCMAKE_ASM_COMPILER_TARGET="$TARGET"                            \
           -DCMAKE_C_FLAGS="$CFLAGS"                                        \

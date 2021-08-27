@@ -64,4 +64,12 @@ cmake -G Ninja                                                              \
       -DLLVM_ENABLE_Z3_SOLVER=OFF                                           \
       "$LLVM_SRC/llvm"
 
-ninja install/strip
+# Build all
+ninja
+
+# Install only the necessary
+ninja install-clang-stripped                                                \
+      install-lld-stripped                                                  \
+      install-LLVM-stripped                                                 \
+      install-clang-cpp-stripped                                            \
+      install-clang-resource-headers-stripped
