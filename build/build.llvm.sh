@@ -61,6 +61,7 @@ cmake -G Ninja                                                              \
       -DLLVM_OPTIMIZED_TABLEGEN=ON                                          \
       -DLLVM_APPEND_VC_REV=OFF                                              \
       -DLLVM_LINK_LLVM_DYLIB=ON                                             \
+      -DLLVM_ENABLE_Z3_SOLVER=OFF                                           \
       "$LLVM_SRC/llvm"
 
 ninja install/strip
