@@ -1,0 +1,139 @@
+# Copyright (C) 2021 University of Rochester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+Import('env')
+
+common_sources = [
+    'startup.c',
+    'support.c',
+    'syscalls.c',
+    'main.c',
+]
+
+#
+# A dict of programs to compile and link, with their additional macro
+# definitions.
+#
+programs = {
+    'aha-compress': [],
+    'aha-mont64': [],
+    'bs': [],
+    'bubblesort': [],
+    'cnt': [],
+    'compress': [],
+    'cover': [],
+    'crc': [],
+    'crc32': [],
+    'ctl-stack': [ 'CTL_STACK', ],
+    'ctl-string': [],
+    'ctl-vector': [ 'CTL_VECTOR', ],
+    'cubic': [],
+    'dijkstra': [],
+    'dtoa': [],
+    'duff': [],
+    'edn': [],
+    'expint': [],
+    'fac': [],
+    'fasta': [],
+    'fdct': [],
+    'fibcall': [],
+    'fir': [],
+    'frac': [],
+    'huffbench': [],
+    'insertsort': [],
+    'janne_complex': [],
+    'jfdctint': [],
+    'lcdnum': [],
+    'levenshtein': [],
+    'ludcmp': [],
+    'matmult-float': [ 'MATMULT_FLOAT', ],
+    'matmult-int': [ 'MATMULT_INT', ],
+    'mergesort': [],
+    'miniz': [],
+    'minver': [],
+    'nbody': [],
+    'ndes': [],
+    'nettle-aes': [],
+    'nettle-arcfour': [],
+    'nettle-cast128': [],
+    'nettle-des': [],
+    'nettle-md5': [],
+    'nettle-sha256': [],
+    'newlib-exp': [],
+    'newlib-log': [],
+    'newlib-mod': [],
+    'newlib-sqrt': [],
+    'ns': [],
+    'nsichneu': [],
+    'picojpeg': [],
+    'prime': [],
+    'qrduino': [],
+    'qsort': [],
+    'qurt': [],
+    'recursion': [],
+    'rijndael': [],
+    'select': [],
+    'sglib-arraybinsearch': [],
+    'sglib-arrayheapsort': [ 'HEAP_SORT', ],
+    'sglib-arrayquicksort': [ 'QUICK_SORT', ],
+    'sglib-dllist': [],
+    'sglib-hashtable': [],
+    'sglib-listinsertsort': [],
+    'sglib-listsort': [],
+    'sglib-queue': [],
+    'sglib-rbtree': [],
+    'slre': [],
+    'sqrt': [],
+    'st': [],
+    'statemate': [],
+    'stb_perlin': [],
+    'stringsearch1': [],
+    'strstr': [],
+    'tarai': [],
+    'trio-snprintf': [
+        'TRIO_DEPRECATED=0',
+        'TRIO_ERRORS=0',
+        'TRIO_EXTENSION=0',
+        'TRIO_FEATURE_FLOAT=0',
+        'TRIO_MICROSOFT=0',
+        'TRIO_SNPRINTF',
+        'TRIO_SNPRINTF_ONLY',
+    ],
+    'trio-sscanf': [
+        'TRIO_DEPRECATED=0',
+        'TRIO_ERRORS=0',
+        'TRIO_EMBED_NAN=1',
+        'TRIO_EMBED_STRING=1',
+        'TRIO_EXTENSION=0',
+        'TRIO_FEATURE_CLOSURE=0',
+        'TRIO_FEATURE_DYNAMICSTRING=0',
+        'TRIO_FEATURE_FD=0',
+        'TRIO_FEATURE_FILE=0',
+        'TRIO_FEATURE_FLOAT=0',
+        'TRIO_FEATURE_LOCALE=0',
+        'TRIO_FEATURE_STDIO=0',
+        'TRIO_FEATURE_STRERR=0',
+        'TRIO_MICROSOFT=0',
+        'TRIO_SSCANF',
+    ],
+    'ud': [],
+    'whetstone': [],
+    'wikisort': [],
+}
+
+for prog in programs:
+    env.Program(prog, common_sources + Glob(prog + '/*.c'),
+                OBJPREFIX=prog + '-',
+                CPPDEFINES=env['CPPDEFINES'] + programs[prog] +
+                           ['BENCHMARK_NAME=\\"' + prog + '\\"'])
