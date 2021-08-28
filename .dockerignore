@@ -1,0 +1,27 @@
+# Git-related files
+.git
+.gitignore
+.gitmodules
+
+# Docker-related files
+Dockerfile
+.dockerignore
+
+# Files in the build directory
+build/*
+!build/llvm/install
+!build/newlib-baseline/install
+!build/newlib-silhouette/install
+!build/compiler-rt-baseline/install
+!build/compiler-rt-silhouette/install
+
+# Files in the llvm-project directory
+llvm-project
+
+# Files in the newlib-cygwin directory
+newlib-cygwin
+
+# Files in the projects directory
+projects/*/build-*
+projects/*/.gitignore
+projects/*/.sconsign.dblite
