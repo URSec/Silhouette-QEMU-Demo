@@ -26,7 +26,7 @@ common_sources = [
 #
 programs = {
     'coremark': [
-        'ITERATIONS=40000',
+        'ITERATIONS=80000',
         'FLAGS_STR=\\"' + ' '.join(env['CCFLAGS']) + '\\"',
     ],
 }
