@@ -22,5 +22,9 @@ COPY build/compiler-rt-silhouette/install build/compiler-rt-silhouette/install
 COPY projects projects
 COPY demo.py demo.py
 
+# Copy textual files to the image
+COPY README.md README.md
+COPY LICENSE.txt LICENSE.txt
+
 # Start with bash
 CMD /usr/bin/env bash
