@@ -37,8 +37,8 @@ few assumptions and dependencies of the environment:
   `PATH`.
 - We use the Silhouette compiler to build Newlib and compiler-rt, so make sure
   that common development tools needed to build Newlib and compiler-rt (such as
-  `make`) are there in `PATH`.  In particular, our build script uses
-  `arm-none-eabi-gcc` to find out where `libgcc` is installed.
+  `make`) are there in `PATH`.  In particular, one of our build scripts uses
+  `arm-none-eabi-gcc` to find out where a bare-metal ARM `libgcc` is installed.
 - We use SCons to build programs, so make sure that `scons` of an appropriate
   version is there in `PATH`.
 - We use QEMU ARM emulator to run ELF binaries built for the Luminary Micro
@@ -94,7 +94,7 @@ Silhouette-QEMU-Demo
    - **Silhouette**: Turn on the shadow stack, store hardening, and CFI passes,
      denoted as `silhouette`.
 
-   After the two scripts finishes, Newlib will be installed in
+   After the two scripts finish, Newlib will be installed in
    `build/newlib-baseline/install` and `build/newlib-silhouette/install` and
    compiler-rt will be installed in `build/compiler-rt-baseline/install` and
    `build/compiler-rt-silhouette/install`.
