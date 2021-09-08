@@ -131,6 +131,7 @@ benchmarks = {
     'tests': [
         'forward',
         'backward',
+        'rop',
     ],
 }
 

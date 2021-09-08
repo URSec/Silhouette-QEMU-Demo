@@ -27,6 +27,7 @@ common_sources = [
 programs = {
     'backward': [],
     'forward': [],
+    'rop': [],
 }
 
 for prog in programs:
