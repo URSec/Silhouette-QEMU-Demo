@@ -17,12 +17,14 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Attack payload and its size */
 extern char payload[];
 extern size_t payload_size;
 
 char *
 get_input(char * buf)
 {
+	/* A buffer overflow vulnerability */
 	return memcpy(buf, payload, payload_size);
 }
 
@@ -30,6 +32,10 @@ uintptr_t
 foo(unsigned n)
 {
 	if (n > 0) {
+		/*
+		 * Recurse to make enough used stack space; the XORs here
+		 * ensure the recurisve call doesn't get tail-call optimized.
+		 */
 		return foo(n - 1) ^ (uintptr_t)&foo ^ (uintptr_t)&foo;
 	} else {
 		char buf[16];
@@ -43,6 +49,8 @@ int main(void)
 	setbuf(stdout, NULL);
 
 	printf("ROP example\n");
+
+	/* The following printf() won't be called if the ROP attack succeeds */
 	printf("Input: %s\n", (char *)foo(100));
 
 	return 0;

