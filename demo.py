@@ -170,7 +170,8 @@ def build(config, benchmark, programs):
     if len(targets) == 0:
         targets += ['build-' + config]
 
-    process = subprocess.Popen(['scons'] + targets, cwd='projects/' + benchmark,
+    process = subprocess.Popen(['scons'] + targets,
+                               cwd=root + '/projects/' + benchmark,
                                stdout=sys.stdout, stderr=subprocess.PIPE,
                                text=True)
     if process.wait() != 0:
@@ -199,7 +200,7 @@ def run(config, benchmark, programs):
 
     # Make sure the programs to run have been built
     for t in targets:
-        elf = 'projects/' + benchmark + '/' + t
+        elf = root + '/projects/' + benchmark + '/' + t
         if not os.path.exists(elf):
             print(elf + ' cannot be found')
             print('Build it by \'' + ' '.join([sys.argv[0], 'build', config, benchmark]) + '\'')
@@ -214,7 +215,8 @@ def run(config, benchmark, programs):
         print('================================================================')
         print('Running ' + t)
         print()
-        process = subprocess.Popen(qemu_args + [t], cwd='projects/' + benchmark,
+        process = subprocess.Popen(qemu_args + [t],
+                                   cwd=root + '/projects/' + benchmark,
                                    stdin=sys.stdin, stdout=sys.stdout,
                                    stderr=subprocess.PIPE, text=True)
         if process.wait() != 0:
