@@ -8,7 +8,7 @@ have an STM32F469 Discovery board with you, you can also replicate our
 evaluation of Silhouette on this board in
 [this repository](https://github.com/URSec/Silhouette-Evaluation).
 
-## Docker Image
+## Using Docker Image
 
 We have set up a Docker image that contains a pre-compiled version of the
 Silhouette compiler, binaries of the libraries (i.e., Newlib and compiler-rt),
@@ -128,7 +128,7 @@ were compiled using the Silhouette configuration.  The generated binaries, as
 well as intermediate object files, will be placed in the
 `projects/<BENCH>/build-<CONFIG>` directory.
 
-## Extension
+## How to Extend
 
 Internally, `demo.py` invokes `scons` to build programs and invokes
 `qemu-system-arm` to run programs.  Each benchmark/program suite in the
