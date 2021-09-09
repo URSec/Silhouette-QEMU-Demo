@@ -104,7 +104,8 @@ Silhouette-QEMU-Demo
 We have a script `demo.py` that can compile and run two benchmark suites
 ([BEEBS](https://beebs.mageec.org) and
 [CoreMark](https://www.eembc.org/coremark)) and a few test programs we wrote to
-demonstrate Silhouette's protections.  The script supports the following
+demonstrate Silhouette's protections (explained
+[here](#what-do-test-programs-do)).  The script supports the following
 command-line argument format
 ```shell
 ./demo.py <ACTION> <CONFIG> <BENCH> [PROGRAM [PROGRAM]...]
@@ -127,6 +128,41 @@ Newlib and compiler-rt of the Baseline configuration as well), and running
 were compiled using the Silhouette configuration.  The generated binaries, as
 well as intermediate object files, will be placed in the
 `projects/<BENCH>/build-<CONFIG>` directory.
+
+## What Do Test Programs Do
+
+Our test program suite contains three test programs that characterize different
+control-flow hijacking attacks: `forward`, `backward`, and `rop`.  You can
+build them using either the baseline or Silhouette configuration and run them
+to examine their execution results with and without Silhouette's protections.
+
+`forward` demonstrates how a forward-edge control flow transfer (i.e., an
+indirect function call) is hijacked to jump to the middle of a function.  When
+built with the baseline configuration, it will jump to code that prints out a
+message indicating a successful attack.  When it is built with the Silhouette
+configuration, you will find that Silhouette's CFI instrumentation detects a
+forward-edge corruption and clears all bits in the corrupted function pointer;
+jumping to the address `0` then triggers a `UsageFault` exception, whose
+handler will print out a message indicating a failed attack.
+
+`backward` demonstrates how a backward-edge control flow transfer (i.e., a
+function return) is hijacked to jump to the beginning of a function that does
+not appear in the regular control flow graph.  In the baseline configuration,
+it corrupts a return address saved on the stack to point to a function which
+prints out a message indicating a successful attack.  The same attack under the
+Silhouette configuration will no longer work, and you will see a message
+printed out to indicate a failure, which is part of the original benign control
+flow.
+
+`rop` simulates a Return-Oriented Programming (ROP) attack, in which an
+attacker hijacks the control flow by corrupting a return address on the stack
+and executing a chain of reusable code gadgets.  In our program, we fabricated
+a buffer overflow vulnerability and crafted an attack payload to print out a
+"hello world"-styled message to the serial console.  The payload is hard-coded
+and is highly dependent on the generated code layout; therefore it is different
+across the baseline and Silhouette configurations.  Similar to that of
+`backward`, such a ROP attack under the Silhouette configuration will not work,
+and `rop`'s original control flow will be executed.
 
 ## How to Extend
 
