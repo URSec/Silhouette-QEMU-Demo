@@ -17,7 +17,7 @@ based on a minimal Ubuntu system on x86_64 and is provided so that one can skip
 building the Silhouette compiler and the libraries to save time.  If you choose
 to run Silhouette using our Docker image, simply run
 ```shell
-docker run -it --rm chaosdefinition/silhouette-qemu-demo
+docker run -it --rm ursec/silhouette-qemu-demo
 ```
 and a shell in a container will be spawned for you.  You can then skip the
 [setup phase](#set-up-the-evaluation-environment) and go directly to the
