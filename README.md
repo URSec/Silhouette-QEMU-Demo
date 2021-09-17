@@ -21,7 +21,7 @@ docker run -it --rm ursec/silhouette-qemu-demo
 ```
 and a shell in a container will be spawned for you.  You can then skip the
 [setup phase](#set-up-the-evaluation-environment) and go directly to the
-[build-and-run phase](#build-and-run-programs).  This image also includes
+[build-and-run phase](#build-debug-and-run-programs).  This image also includes
 useful tools (such as `arm-none-eabi-objdump`) to examine generated binaries.
 
 ## Everything from Scratch
@@ -44,6 +44,15 @@ few assumptions and dependencies of the environment:
 - We use QEMU ARM emulator to run ELF binaries built for the Luminary Micro
   Stellaris LM3S6965EVB board, so `qemu-system-arm` of an appropriate version
   must be found in `PATH`.
+- We use GDB to debug ELF binaries and have debugging support included in one
+  of our scripts.  If you would like to use our script for debugging, make sure
+  either `gdb-multiarch` or `arm-none-eabi-gdb` is there in `PATH`.  In
+  addition, the script uses GNU Screen to simultaneously run QEMU and GDB, so
+  `screen` of an appropriate version must also be found in `PATH`.
+
+Again, our [Docker image](#using-docker-image) meets every assumption and has
+every dependency pre-installed.  It is the recommended way to try out
+Silhouette on QEMU.
 
 Following is the directory hierarchy of this repository:
 
@@ -65,7 +74,7 @@ Silhouette-QEMU-Demo
 |   |-- coremark             # Source code of CoreMark benchmark
 |   |-- tests                # Source code of test programs
 |
-|-- demo.py                  # Script to build and run programs
+|-- demo.py                  # Script to build, debug, and run programs
 |
 |-- README.md                # This README file
 ```
@@ -99,10 +108,10 @@ Silhouette-QEMU-Demo
    compiler-rt will be installed in `build/compiler-rt-baseline/install` and
    `build/compiler-rt-silhouette/install`.
 
-### Build and Run Programs
+### Build, Debug, and Run Programs
 
-We have a script `demo.py` that can compile and run two benchmark suites
-([BEEBS](https://beebs.mageec.org) and
+We have a script `demo.py` that can compile, debug, and run two benchmark
+suites ([BEEBS](https://beebs.mageec.org) and
 [CoreMark](https://www.eembc.org/coremark)) and a few test programs we wrote to
 demonstrate Silhouette's protections (explained
 [here](#what-do-test-programs-do)).  The script supports the following
@@ -111,7 +120,7 @@ command-line argument format
 ./demo.py <ACTION> <CONFIG> <BENCH> [PROGRAM [PROGRAM]...]
 ```
 where
-- `ACTION` can be either `build` or `run`,
+- `ACTION` can be `build`, `debug`, or `run`,
 - `CONFIG` is the name of a configuration (either `baseline` or `silhouette`,
   see above),
 - `BENCH` is the name of the benchmark/program suite (`beebs`, `coremark`, or
@@ -125,9 +134,24 @@ benchmark/program suite will be compiled/run.  For example, running
 and `ns`, respectively) in BEEBS using the Baseline configuration (and link
 Newlib and compiler-rt of the Baseline configuration as well), and running
 `./demo.py run silhouette tests` will run all the test programs we wrote that
-were compiled using the Silhouette configuration.  The generated binaries, as
-well as intermediate object files, will be placed in the
-`projects/<BENCH>/build-<CONFIG>` directory.
+were compiled using the Silhouette configuration.
+
+For `build`, the generated binaries, as well as intermediate object files, will
+be placed in the `projects/<BENCH>/build-<CONFIG>` directory.
+
+For `run`, the script will spawn a QEMU process for running each of the
+specified binaries.  You can quit QEMU at any point by
+<kbd>Ctrl</kbd>-<kbd>A</kbd> + <kbd>C</kbd> (which opens QEMU's monitor
+console) and then typing `quit`/`q`.
+
+For `debug`, what the script does is simply creating a debugging session of two
+side-by-side windows in GNU Screen (again, for each of the specified binaries),
+where the window on the left side runs QEMU and the window on the right side
+runs GDB.  You can switch between the two windows by
+<kbd>Ctrl</kbd>-<kbd>A</kbd> + <kbd>Tab</kbd>.  To open QEMU's monitor console,
+now you need to press <kbd>Ctrl</kbd>-<kbd>A</kbd> + <kbd>A</kbd> + <kbd>C</kbd>
+when the QEMU window has the input, as both QEMU and GNU Screen use
+<kbd>Ctrl</kbd>-<kbd>A</kbd> as their control character.
 
 ## What Do Test Programs Do
 
@@ -176,8 +200,8 @@ Specifically:
   when building programs in `BENCH`.
 - `projects/<BENCH>/src/programs.scons` defines program-specific settings and
   will be loaded by the above `SConstruct` script.
-- If you want to run a newly added program via `demo.py`, simply add the
-  program name to the `benchmarks` dictionary in the script.
+- If you want to debug or run a newly added program via `demo.py`, simply add
+  the program name to the `benchmarks` dictionary in the script.
 
 The biggest constraint for supporting larger programs (such as
 [CoreMark-Pro](https://www.eembc.org/coremark-pro)) is the limited memory on
