@@ -149,15 +149,15 @@ def build(config, benchmark, programs):
     # Make sure the compiler and libraries have been built
     if not os.path.exists(build_dir + '/llvm/install/bin/clang'):
         print('The Silhouette compiler cannot be found')
-        print('Run \'./build/build.llvm.sh\' to build it')
+        print('Run \'' + build_dir + '/build.llvm.sh\' to build it')
         exit(1)
     if not os.path.exists(build_dir + '/newlib-' + config + '/install/arm-none-eabi/lib/libc.a'):
         print('Newlib for ' + config + ' cannot be found')
-        print('Run \'./build/build.newlib.sh\' to build it')
+        print('Run \'' + build_dir + '/build.newlib.sh\' to build it')
         exit(1)
     if not os.path.exists(build_dir + '/compiler-rt-' + config + '/install/lib/baremetal/libclang_rt.builtins-arm.a'):
         print('Compiler-rt for ' + config + ' cannot be found')
-        print('Run \'./build/build.compiler.rt.sh\' to build it')
+        print('Run \'' + build_dir + '/build.compiler.rt.sh\' to build it')
         exit(1)
 
     # Make sure SCons is installed
