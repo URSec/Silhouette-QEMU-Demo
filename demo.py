@@ -19,6 +19,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 
 
 #
@@ -225,13 +226,79 @@ def run(config, benchmark, programs):
 
 
 #
+# Debug one or more programs in a benchmark suite under a specified
+# configuration, using QEMU and GDB.
+#
+# @config: the configuration.
+# @benchmark: the benchmark suite.
+# @programs: a list of programs to debug (empty means all).
+#
+def debug(config, benchmark, programs):
+    targets = []
+    if len(programs) == 0:
+        programs = benchmarks[benchmark]
+    for p in programs:
+        targets += ['build-' + config + '/' + config + '-' + p + '.elf']
+
+    # Make sure QEMU, GDB, and Screen are installed
+    if not shutil.which('qemu-system-arm'):
+        print('QEMU cannot be found')
+        exit(1)
+    gdb = 'gdb-multiarch'
+    if not shutil.which(gdb):
+        gdb = 'arm-none-eabi-gdb'
+        if not shutil.which(gdb):
+            print('GDB cannot be found')
+            exit(1)
+    if not shutil.which('screen'):
+        print('Screen cannot be found')
+        exit(1)
+
+    # Make sure the programs to debug have been built
+    for t in targets:
+        elf = root + '/projects/' + benchmark + '/' + t
+        if not os.path.exists(elf):
+            print(elf + ' cannot be found')
+            print('Build it by \'' + ' '.join([sys.argv[0], 'build', config, benchmark]) + '\'')
+            exit(1)
+
+    # Run QEMU and GDB via screen
+    qemu_args = [
+        'qemu-system-arm', '-M', 'lm3s6965evb', '-serial', 'mon:stdio',
+        '-append', 'console=ttyS0', '-nographic', '-S', '-s', '-kernel',
+    ]
+    gdb_args = [
+        gdb, '-ex', '"target remote :1234"',
+    ]
+    for t in targets:
+        print('================================================================')
+        print('Debugging ' + t)
+        print()
+
+        # Create a temporary .screenrc file
+        with tempfile.NamedTemporaryFile(mode='wt') as f:
+            screenrc = f.name
+            f.writelines('split -v\n')
+            f.writelines(' '.join(['screen'] + qemu_args + [t]) + '\n')
+            f.writelines('focus\n')
+            f.writelines(' '.join(['screen'] + gdb_args + [t]) + '\n')
+            f.flush()
+
+            process = subprocess.Popen(['screen', '-c', screenrc],
+                                       cwd=root + '/projects/' + benchmark,
+                                       start_new_session=True)
+            if process.wait() != 0:
+                exit(1)
+
+
+#
 # The main function.
 #
 def main():
     # Construct a CLI argument parser
     parser = argparse.ArgumentParser(description='Silhouette QEMU Demo')
-    parser.add_argument('action', choices=['build', 'run'], metavar='ACTION',
-                        help='Action to do (build, run)')
+    parser.add_argument('action', choices=['build', 'run', 'debug'], metavar='ACTION',
+                        help='Action to do (build, run, debug)')
     parser.add_argument('configuration', choices=configurations, metavar='CONFIG',
                         help='Name of the configuration (' + ', '.join(configurations) + ')')
     parser.add_argument('benchmark', choices=benchmarks.keys(), metavar='BENCH',
@@ -254,6 +321,8 @@ def main():
     # Build or run
     if action == 'build':
         build(config, benchmark, program)
+    elif action == 'debug':
+        debug(config, benchmark, program)
     else:
         run(config, benchmark, program)
 

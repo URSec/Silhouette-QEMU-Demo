@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     scons \
     python3 \
     qemu-system-arm \
+    gdb-multiarch \
+    screen \
     vim-tiny
 
 # Copy the already-built compiler and libraries, source files of programs, and
