@@ -173,13 +173,8 @@ def build(config, benchmark, programs):
 
     process = subprocess.Popen(['scons'] + targets,
                                cwd=root + '/projects/' + benchmark,
-                               stdout=sys.stdout, stderr=subprocess.PIPE,
-                               text=True)
+                               start_new_session=True)
     if process.wait() != 0:
-        print('****************************************************************')
-        print('Build failure')
-        print('Error output:')
-        print(process.stderr.read())
         exit(1)
 
 
@@ -218,13 +213,8 @@ def run(config, benchmark, programs):
         print()
         process = subprocess.Popen(qemu_args + [t],
                                    cwd=root + '/projects/' + benchmark,
-                                   stdin=sys.stdin, stdout=sys.stdout,
-                                   stderr=subprocess.PIPE, text=True)
+                                   start_new_session=True)
         if process.wait() != 0:
-            print('****************************************************************')
-            print('Run failure')
-            print('Error output:')
-            print(process.stderr.read())
             exit(1)
 
 
