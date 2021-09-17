@@ -194,6 +194,11 @@ def run(config, benchmark, programs):
     for p in programs:
         targets += ['build-' + config + '/' + config + '-' + p + '.elf']
 
+    # Make sure QEMU is installed
+    if not shutil.which('qemu-system-arm'):
+        print('QEMU cannot be found')
+        exit(1)
+
     # Make sure the programs to run have been built
     for t in targets:
         elf = root + '/projects/' + benchmark + '/' + t
@@ -202,6 +207,7 @@ def run(config, benchmark, programs):
             print('Build it by \'' + ' '.join([sys.argv[0], 'build', config, benchmark]) + '\'')
             exit(1)
 
+    # Run QEMU
     qemu_args = [
         'qemu-system-arm', '-M', 'lm3s6965evb', '-serial', 'mon:stdio',
         '-append', 'console=ttyS0', '-nographic', '-kernel',
