@@ -205,7 +205,7 @@ Specifically:
 
 The biggest constraint for supporting larger programs (such as
 [CoreMark-Pro](https://www.eembc.org/coremark-pro)) is the limited memory on
-the LM3S6965EVK board.  The board only has 256 KB of flash memory and 64 KB of
+the LM3S6965EVB board.  The board only has 256 KB of flash memory and 64 KB of
 SRAM.  You can find how we lay out memory regions in the linker scripts,
 `LinkerScript-baseline.ld` and `LinkerScript-silhouette.ld`, of each
 benchmark/program suite.  In particular, we place the shadow stack above the
