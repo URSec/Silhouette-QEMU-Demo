@@ -155,8 +155,9 @@ when the QEMU window has the input, as both QEMU and GNU Screen use
 
 ## What Do Test Programs Do
 
-Our test program suite contains three test programs that characterize different
-control-flow hijacking attacks: `forward`, `backward`, and `rop`.  You can
+Our test program suite contains four test programs that characterize different
+memory safety and control-flow hijacking attacks: `forward`, `backward`,
+`overflow`, and `rop`.  You can
 build them using either the baseline or Silhouette configuration and run them
 to examine their execution results with and without Silhouette's protections.
 
@@ -177,6 +178,12 @@ prints out a message indicating a successful attack.  The same attack under the
 Silhouette configuration will no longer work, and you will see a message
 printed out to indicate a failure, which is part of the original benign control
 flow.
+
+`overflow` demonstrates that a stack-based buffer overflow vulnerability may
+write past the stack region and overwrite other memory regions.  In the
+Silhouette configuration, it will try to corrupt the shadow stack region, which
+is placed next to the stack region, and it will be captured as the shadow stack
+is protected from writes initiated by unprivileged stores.
 
 `rop` simulates a Return-Oriented Programming (ROP) attack, in which an
 attacker hijacks the control flow by corrupting a return address on the stack
