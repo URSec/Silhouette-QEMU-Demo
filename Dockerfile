@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     qemu-system-arm \
     gdb-multiarch \
     screen \
-    vim-tiny
+    less \
+    vim
 
 # Copy the already-built compiler and libraries, source files of programs, and
 # our demo script to the image
