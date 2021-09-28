@@ -130,8 +130,9 @@ benchmarks = {
         'coremark',
     ],
     'tests': [
-        'forward',
         'backward',
+        'forward',
+        'overflow',
         'rop',
     ],
 }
