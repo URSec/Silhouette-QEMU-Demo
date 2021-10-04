@@ -17,41 +17,58 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Attack payload and its size */
-extern char payload[];
-extern size_t payload_size;
+extern int __io_getchar(void);
 
 char *
-get_input(char * buf)
+do_get_input(char * buf, size_t size)
 {
-	/* A buffer overflow vulnerability */
-	return memcpy(buf, payload, payload_size);
+	char * ptr = buf;
+
+	while (ptr != buf + size) {
+		char ch = __io_getchar();
+		*ptr++ = ch;
+
+		if (ch == '\r') {
+			break;
+		}
+	}
+
+	if (ptr != buf + size) {
+		*ptr++ = '\0';
+	}
+
+	printf("\n");
+
+	return buf;
 }
 
-uintptr_t
-foo(unsigned n)
+char *
+get_input_from_stdio(unsigned n)
 {
 	if (n > 0) {
 		/*
 		 * Recurse to make enough used stack space; the XORs here
 		 * ensure the recurisve call doesn't get tail-call optimized.
 		 */
-		return foo(n - 1) ^ (uintptr_t)&foo ^ (uintptr_t)&foo;
+		return (char *)((uintptr_t)get_input_from_stdio(n - 1) ^
+		                (uintptr_t)&get_input_from_stdio ^
+				(uintptr_t)&get_input_from_stdio);
 	} else {
 		char buf[16];
 
-		return (uintptr_t)get_input(buf);
+		return do_get_input(buf, sizeof(buf));
 	}
 }
 
 int main(void)
 {
-	setbuf(stdout, NULL);
+	setvbuf(stdin, NULL, _IONBF, 0);
+	setvbuf(stdout, NULL, _IONBF, 0);
 
-	printf("ROP example\n");
-
-	/* The following printf() won't be called if the ROP attack succeeds */
-	printf("Input: %s\n", (char *)foo(100));
+	while (1) {
+		printf("Please type a string:\n");
+		printf("You typed: %s\n", get_input_from_stdio(100));
+	}
 
 	return 0;
 }
