@@ -135,7 +135,7 @@ benchmarks = {
         'backward',
         'forward',
         'overflow',
-        'rop',
+        'ditto',
     ],
 }
 

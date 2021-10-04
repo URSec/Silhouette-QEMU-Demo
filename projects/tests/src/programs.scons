@@ -28,7 +28,7 @@ programs = {
     'backward': [],
     'forward': [],
     'overflow': [],
-    'rop': [],
+    'ditto': [],
 }
 
 for prog in programs:
