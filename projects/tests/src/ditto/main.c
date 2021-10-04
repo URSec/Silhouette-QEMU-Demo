@@ -24,7 +24,7 @@ do_get_input(char * buf, size_t size)
 {
 	char * ptr = buf;
 
-	while (ptr != buf + size) {
+	while (ptr < buf + size - 1) {
 		char ch = __io_getchar();
 		*ptr++ = ch;
 
@@ -33,9 +33,7 @@ do_get_input(char * buf, size_t size)
 		}
 	}
 
-	if (ptr != buf + size) {
-		*ptr++ = '\0';
-	}
+	*ptr++ = '\0';
 
 	printf("\r\n");
 
