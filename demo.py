@@ -16,10 +16,12 @@
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 
 #
@@ -196,9 +198,12 @@ def run(config, benchmark, programs):
     for p in programs:
         targets += ['build-' + config + '/' + config + '-' + p + '.elf']
 
-    # Make sure QEMU is installed
+    # Make sure QEMU and Screen are installed
     if not shutil.which('qemu-system-arm'):
         print('QEMU cannot be found')
+        exit(1)
+    if not shutil.which('screen'):
+        print('Screen cannot be found')
         exit(1)
 
     # Make sure the programs to run have been built
@@ -209,21 +214,54 @@ def run(config, benchmark, programs):
             print('Build it by \'' + ' '.join([sys.argv[0], 'build', config, benchmark]) + '\'')
             exit(1)
 
-    # Run QEMU
+    # Run QEMU via Screen
     qemu_args = [
-        'qemu-system-arm', '-M', 'lm3s6965evb', '-serial', 'mon:stdio',
-        '-append', 'console=ttyS0', '-nographic', '-kernel',
+        'qemu-system-arm', '-M', 'lm3s6965evb', '-serial', 'pty',
+        '-nographic', '-kernel',
     ]
-    print('Quit QEMU by Ctrl-A + C and then \'quit\'')
     for t in targets:
         print('================================================================')
         print('Running ' + t)
         print()
-        process = subprocess.Popen(qemu_args + [t],
-                                   cwd=root + '/projects/' + benchmark,
-                                   start_new_session=True)
-        if process.wait() != 0:
-            exit(1)
+
+        with tempfile.TemporaryDirectory() as d:
+            # Create a temporary .screenrc file
+            screenrc = os.path.join(d, 'screenrc')
+            screenlog = os.path.join(d, 'screenlog')
+            with open(screenrc, mode='at') as f:
+                f.writelines('logfile flush 0\n')
+                f.writelines('split -v\n')
+                f.writelines('focus\n')
+                f.writelines(' '.join(['screen'] + qemu_args + [t]) + '\n')
+                f.writelines('focus\n')
+
+            # Spawn the Screen process
+            process = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
+                                        '-L', '-Logfile', screenlog,
+                                        '-c', screenrc],
+                                       cwd=root + '/projects/' + benchmark,
+                                       start_new_session=True)
+            time.sleep(1)
+
+            # Find out which PTY was created by QEMU
+            pattern = 'char device redirected to (.*) \(label .*\)'
+            pts = None
+            with open(screenlog) as f:
+                for line in f:
+                    match = re.search(pattern, line)
+                    if match:
+                        pts = match.group(1)
+            assert pts is not None
+
+            # Tell the Screen process to monitor the PTY
+            process2 = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
+                                         '-X', 'screen', pts],
+                                        cwd=root + '/projects/' + benchmark,
+                                        start_new_session=True)
+            if process2.wait() != 0:
+                exit(1)
+            if process.wait() != 0:
+                exit(1)
 
 
 #
@@ -265,8 +303,8 @@ def debug(config, benchmark, programs):
 
     # Run QEMU and GDB via screen
     qemu_args = [
-        'qemu-system-arm', '-M', 'lm3s6965evb', '-serial', 'mon:stdio',
-        '-append', 'console=ttyS0', '-nographic', '-S', '-s', '-kernel',
+        'qemu-system-arm', '-M', 'lm3s6965evb', '-serial', 'pty',
+        '-nographic', '-S', '-s', '-kernel',
     ]
     gdb_args = [
         gdb, '-ex', '"target remote :1234"',
@@ -276,18 +314,45 @@ def debug(config, benchmark, programs):
         print('Debugging ' + t)
         print()
 
-        # Create a temporary .screenrc file
-        with tempfile.NamedTemporaryFile(mode='wt') as f:
-            screenrc = f.name
-            f.writelines('split -v\n')
-            f.writelines(' '.join(['screen'] + qemu_args + [t]) + '\n')
-            f.writelines('focus\n')
-            f.writelines(' '.join(['screen'] + gdb_args + [t]) + '\n')
-            f.flush()
+        with tempfile.TemporaryDirectory() as d:
+            # Create a temporary .screenrc file
+            screenrc = os.path.join(d, 'screenrc')
+            screenlog = os.path.join(d, 'screenlog')
+            with open(screenrc, mode='at') as f:
+                f.writelines('logfile flush 0\n')
+                f.writelines('split -v\n')
+                f.writelines('split\n')
+                f.writelines('focus\n')
+                f.writelines(' '.join(['screen'] + qemu_args + [t]) + '\n')
+                f.writelines('focus\n')
+                f.writelines(' '.join(['screen'] + gdb_args + [t]) + '\n')
+                f.writelines('focus\n')
 
-            process = subprocess.Popen(['screen', '-c', screenrc],
+            # Spawn the Screen process
+            process = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
+                                        '-L', '-Logfile', screenlog,
+                                        '-c', screenrc],
                                        cwd=root + '/projects/' + benchmark,
                                        start_new_session=True)
+            time.sleep(1)
+
+            # Find out which PTY was created by QEMU
+            pattern = 'char device redirected to (.*) \(label .*\)'
+            pts = None
+            with open(screenlog) as f:
+                for line in f:
+                    match = re.search(pattern, line)
+                    if match:
+                        pts = match.group(1)
+            assert pts is not None
+
+            # Tell the Screen process to monitor the PTY
+            process2 = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
+                                         '-X', 'screen', pts],
+                                        cwd=root + '/projects/' + benchmark,
+                                        start_new_session=True)
+            if process2.wait() != 0:
+                exit(1)
             if process.wait() != 0:
                 exit(1)
 
