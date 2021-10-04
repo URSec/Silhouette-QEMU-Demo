@@ -163,7 +163,7 @@ ee_u16 core_bench_list(core_results *res, ee_s16 finder_idx) {
 		if (info.idx>=0)
 			info.idx++;
 #if CORE_DEBUG
-	ee_printf("List find %d: [%d,%d,%d]\n",i,retval,missed,found);
+	ee_printf("List find %d: [%d,%d,%d]\r\n",i,retval,missed,found);
 #endif
 	}
 	retval+=found*4-missed;
@@ -180,7 +180,7 @@ ee_u16 core_bench_list(core_results *res, ee_s16 finder_idx) {
 		finder=finder->next;
 	}
 #if CORE_DEBUG
-	ee_printf("List sort 1: %04x\n",retval);
+	ee_printf("List sort 1: %04x\r\n",retval);
 #endif
 	remover=core_list_undo_remove(remover,list->next);
 	/* sort the list by index, in effect returning the list to original state */
@@ -192,7 +192,7 @@ ee_u16 core_bench_list(core_results *res, ee_s16 finder_idx) {
 		finder=finder->next;
 	}
 #if CORE_DEBUG
-	ee_printf("List sort 2: %04x\n",retval);
+	ee_printf("List sort 2: %04x\r\n",retval);
 #endif
 	return retval;
 }
@@ -253,13 +253,13 @@ list_head *core_list_init(ee_u32 blksize, list_head *memblock, ee_s16 seed) {
 	}
 	list = core_list_mergesort(list,cmp_idx,NULL);
 #if CORE_DEBUG
-	ee_printf("Initialized list:\n");
+	ee_printf("Initialized list:\r\n");
 	finder=list;
 	while (finder) {
 		ee_printf("[%04x,%04x]",finder->info->idx,(ee_u16)finder->info->data16);
 		finder=finder->next;
 	}
-	ee_printf("\n");
+	ee_printf("\r\n");
 #endif
 	return list;
 }

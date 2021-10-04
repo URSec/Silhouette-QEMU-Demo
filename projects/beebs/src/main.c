@@ -49,7 +49,7 @@ int main(void)
 
 	unsigned t_start, t;
 
-	printf("Start to run %s.\n", BENCHMARK_NAME);
+	printf("Start to run %s.\r\n", BENCHMARK_NAME);
 
 	t_start = SysTick_GetTick();
 	for (i = 0; i < REPEAT_FACTOR; i++) {
@@ -71,7 +71,7 @@ int main(void)
 		printf("Finished in %u ms, but verify_benchmark() found errors.", t);
 		break;
 	}
-	printf("\n");
+	printf("\r\n");
 
 	return 0;
 }

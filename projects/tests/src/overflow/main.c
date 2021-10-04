@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
-char input[32] = "Dummy input\n";
+char input[32] = "Dummy input\r\n";
 
 int main(void)
 {
@@ -25,7 +25,7 @@ int main(void)
 
 	memcpy(buf, &input, sizeof(input));
 
-	printf("Stack buffer overflow succeeded!\n");
+	printf("Stack buffer overflow succeeded!\r\n");
 
 	return 0;
 }
@@ -37,7 +37,7 @@ MemManage_Handler(void)
 	 * An unprivileged write to the protected shadow stack will lead us
 	 * here.
 	 */
-	printf("Stack buffer overflow failed!\n");
+	printf("Stack buffer overflow failed!\r\n");
 
 	while (1) {
 	}

@@ -37,7 +37,7 @@ do_get_input(char * buf, size_t size)
 		*ptr++ = '\0';
 	}
 
-	printf("\n");
+	printf("\r\n");
 
 	return buf;
 }
@@ -66,8 +66,8 @@ int main(void)
 	setvbuf(stdout, NULL, _IONBF, 0);
 
 	while (1) {
-		printf("Please type a string:\n");
-		printf("You typed: %s\n", get_input_from_stdio(100));
+		printf("Please type a string:\r\n");
+		printf("You typed: %s\r\n", get_input_from_stdio(100));
 	}
 
 	return 0;

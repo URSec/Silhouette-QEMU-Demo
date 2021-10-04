@@ -49,26 +49,26 @@ void matrix_add_const(ee_u32 N, MATDAT *A, MATDAT val);
 #if CORE_DEBUG
 void printmat(MATDAT *A, ee_u32 N, char *name) {
 	ee_u32 i,j;
-	ee_printf("Matrix %s [%dx%d]:\n",name,N,N);
+	ee_printf("Matrix %s [%dx%d]:\r\n",name,N,N);
 	for (i=0; i<N; i++) {
 		for (j=0; j<N; j++) {
 			if (j!=0)
 				ee_printf(",");
 			ee_printf("%d",A[i*N+j]);
 		}
-		ee_printf("\n");
+		ee_printf("\r\n");
 	}
 }
 void printmatC(MATRES *C, ee_u32 N, char *name) {
 	ee_u32 i,j;
-	ee_printf("Matrix %s [%dx%d]:\n",name,N,N);
+	ee_printf("Matrix %s [%dx%d]:\r\n",name,N,N);
 	for (i=0; i<N; i++) {
 		for (j=0; j<N; j++) {
 			if (j!=0)
 				ee_printf(",");
 			ee_printf("%d",C[i*N+j]);
 		}
-		ee_printf("\n");
+		ee_printf("\r\n");
 	}
 }
 #endif

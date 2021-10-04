@@ -46,10 +46,10 @@ foo(void)
 void __attribute__((used, noinline))
 bar(void)
 {
-	printf("Dummy message\n");
+	printf("Dummy message\r\n");
 }
 
-const char * __attribute__((used)) str = "Forward edge corruption succeeded!\n";
+const char * __attribute__((used)) str = "Forward edge corruption succeeded!\r\n";
 
 void __attribute__((naked, noinline))
 baz(void)
@@ -72,7 +72,7 @@ void
 MemManage_Handler(void)
 {
 	/* A CFI violation will lead us here */
-	printf("Forward edge corruption failed!\n");
+	printf("Forward edge corruption failed!\r\n");
 
 	while (1) {
 	}

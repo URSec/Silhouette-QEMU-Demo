@@ -28,7 +28,7 @@ foo(void)
 	bar();
 
 	/* A failed return address corruption will lead us here */
-	printf("Backward edge corruption failed!\n");
+	printf("Backward edge corruption failed!\r\n");
 }
 
 register char * stack_ptr asm ("sp");
@@ -53,7 +53,7 @@ void __attribute__((noinline))
 baz(void)
 {
 	/* A successful return address corruption will lead us here */
-	printf("Backward edge corruption succeeded!\n");
+	printf("Backward edge corruption succeeded!\r\n");
 
 	/* Do malicious computation */
 	while (1) {
