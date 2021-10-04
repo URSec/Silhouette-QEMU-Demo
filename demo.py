@@ -230,7 +230,7 @@ def run(config, benchmark, programs):
             screenlog = os.path.join(d, 'screenlog')
             with open(screenrc, mode='at') as f:
                 f.writelines('logfile flush 0\n')
-                f.writelines('split -v\n')
+                f.writelines('split\n')
                 f.writelines('focus\n')
                 f.writelines(' '.join(['screen'] + qemu_args + [t]) + '\n')
                 f.writelines('focus\n')
