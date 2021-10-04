@@ -315,7 +315,7 @@ Clock_Init(void)
 #define STCURRENT_CURRENT_GET(x)	(((x) & STCURRENT_CURRENT_MASK) >> STCURRENT_CURRENT_SHIFT)
 
 /* Number of ticks */
-static uint32_t tick;
+static volatile uint32_t tick;
 
 /*
  * Initialize SysTick.
