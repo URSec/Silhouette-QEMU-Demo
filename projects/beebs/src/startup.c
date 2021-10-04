@@ -262,6 +262,10 @@ ResetISR(void)
 	// Reenable interrupts
 	asm volatile ("cpsie i");
 
+	/* Delay for a second */
+	extern unsigned SysTick_GetTick(void);
+	for (unsigned s = SysTick_GetTick(); SysTick_GetTick() - s < 1000; ) ;
+
 	main();
 
 	//
