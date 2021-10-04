@@ -26,6 +26,7 @@
 #define RCC	*(volatile uint32_t *)0x400fe060
 #define PLLCFG	*(volatile uint32_t *)0x400fe064
 #define RCC2	*(volatile uint32_t *)0x400fe070
+#define RCGC1	*(volatile uint32_t *)0x400fe104
 
 /* RIS field accessors */
 #define RIS_PLLLRIS_SHIFT	(6)
@@ -112,6 +113,12 @@
 #define RCC2_OSCSRC2_MASK	(0x7u << RCC2_OSCSRC2_SHIFT)
 #define RCC2_OSCSRC2_SET(x)	(((x) << RCC2_OSCSRC2_SHIFT) & RCC2_OSCSRC2_MASK)
 #define RCC2_OSCSRC2_GET(x)	(((x) & RCC2_OSCSRC2_MASK) >> RCC2_OSCSRC2_SHIFT)
+
+/* RCGC1 field accessors */
+#define RCGC1_UART0_SHIFT	(0)
+#define RCGC1_UART0_MASK	(0x1u << RCGC1_UART0_SHIFT)
+#define RCGC1_UART0_SET(x)	(((x) << RCGC1_UART0_SHIFT) & RCGC1_UART0_MASK)
+#define RCGC1_UART0_GET(x)	(((x) & RCGC1_UART0_MASK) >> RCGC1_UART0_SHIFT)
 
 /* Preset oscillator frequencies */
 #define IOSC_FREQ	(12000000u)
@@ -263,6 +270,9 @@ Clock_Init(void)
 
 	/* Update the system clock frequency */
 	SystemCoreClockUpdate();
+
+	/* Clock the UART0 peripheral */
+	RCGC1 |= RCGC1_UART0_SET(1);
 }
 
 //=============================================================================
@@ -352,13 +362,137 @@ SysTick_GetTick(void)
 //=============================================================================
 
 /* UART registers */
-#define UART0DR	*(volatile uint32_t *)0x4000c000
+#define UART0DR		*(volatile uint32_t *)0x4000c000
+#define UART0FR		*(volatile uint32_t *)0x4000c018
+#define UART0IBRD	*(volatile uint32_t *)0x4000c024
+#define UART0FBRD	*(volatile uint32_t *)0x4000c028
+#define UART0LCRH	*(volatile uint32_t *)0x4000c02c
+#define UART0CTL	*(volatile uint32_t *)0x4000c030
 
 /* UART0DR field accessors */
 #define UART0DR_DATA_SHIFT	(0)
 #define UART0DR_DATA_MASK	(0xffu << UART0DR_DATA_SHIFT)
 #define UART0DR_DATA_SET(x)	(((x) << UART0DR_DATA_SHIFT) & UART0DR_DATA_MASK)
 #define UART0DR_DATA_GET(x)	(((x) & UART0DR_DATA_MASK) >> UART0DR_DATA_SHIFT)
+
+/* UART0FR field accessors */
+#define UART0FR_TXFE_SHIFT	(7)
+#define UART0FR_TXFE_MASK	(0x1u << UART0FR_TXFE_SHIFT)
+#define UART0FR_TXFE_GET(x)	(((x) & UART0FR_TXFE_MASK) >> UART0FR_TXFE_SHIFT)
+#define UART0FR_RXFF_SHIFT	(6)
+#define UART0FR_RXFF_MASK	(0x1u << UART0FR_RXFF_SHIFT)
+#define UART0FR_RXFF_GET(x)	(((x) & UART0FR_RXFF_MASK) >> UART0FR_RXFF_SHIFT)
+#define UART0FR_TXFF_SHIFT	(5)
+#define UART0FR_TXFF_MASK	(0x1u << UART0FR_TXFF_SHIFT)
+#define UART0FR_TXFF_GET(x)	(((x) & UART0FR_TXFF_MASK) >> UART0FR_TXFF_SHIFT)
+#define UART0FR_RXFE_SHIFT	(4)
+#define UART0FR_RXFE_MASK	(0x1u << UART0FR_RXFE_SHIFT)
+#define UART0FR_RXFE_GET(x)	(((x) & UART0FR_RXFE_MASK) >> UART0FR_RXFE_SHIFT)
+#define UART0FR_BUSY_SHIFT	(3)
+#define UART0FR_BUSY_MASK	(0x1u << UART0FR_BUSY_SHIFT)
+#define UART0FR_BUSY_GET(x)	(((x) & UART0FR_BUSY_MASK) >> UART0FR_BUSY_SHIFT)
+
+/* UART0IBRD field accessors */
+#define UART0IBRD_DIVINT_SHIFT	(0)
+#define UART0IBRD_DIVINT_MASK	(0xffffu << UART0IBRD_DIVINT_SHIFT)
+#define UART0IBRD_DIVINT_SET(x)	(((x) << UART0IBRD_DIVINT_SHIFT) & UART0IBRD_DIVINT_MASK)
+#define UART0IBRD_DIVINT_GET(x)	(((x) & UART0IBRD_DIVINT_MASK) >> UART0IBRD_DIVINT_SHIFT)
+
+/* UART0FBRD field accessors */
+#define UART0FBRD_DIVFRAC_SHIFT		(0)
+#define UART0FBRD_DIVFRAC_MASK		(0x3fu << UART0FBRD_DIVFRAC_SHIFT)
+#define UART0FBRD_DIVFRAC_SET(x)	(((x) << UART0FBRD_DIVFRAC_SHIFT) & UART0FBRD_DIVFRAC_MASK)
+#define UART0FBRD_DIVFRAC_GET(x)	(((x) & UART0FBRD_DIVFRAC_MASK) >> UART0FBRD_DIVFRAC_SHIFT)
+
+/* UART0LCRH field accessors */
+#define UART0LCRH_SPS_SHIFT	(7)
+#define UART0LCRH_SPS_MASK	(0x1u << UART0LCRH_SPS_SHIFT)
+#define UART0LCRH_SPS_SET(x)	(((x) << UART0LCRH_SPS_SHIFT) & UART0LCRH_SPS_MASK)
+#define UART0LCRH_SPS_GET(x)	(((x) & UART0LCRH_SPS_MASK) >> UART0LCRH_SPS_SHIFT)
+#define UART0LCRH_WLEN_SHIFT	(5)
+#define UART0LCRH_WLEN_MASK	(0x3u << UART0LCRH_WLEN_SHIFT)
+#define UART0LCRH_WLEN_SET(x)	(((x) << UART0LCRH_WLEN_SHIFT) & UART0LCRH_WLEN_MASK)
+#define UART0LCRH_WLEN_GET(x)	(((x) & UART0LCRH_WLEN_MASK) >> UART0LCRH_WLEN_SHIFT)
+#define UART0LCRH_FEN_SHIFT	(4)
+#define UART0LCRH_FEN_MASK	(0x1u << UART0LCRH_FEN_SHIFT)
+#define UART0LCRH_FEN_SET(x)	(((x) << UART0LCRH_FEN_SHIFT) & UART0LCRH_FEN_MASK)
+#define UART0LCRH_FEN_GET(x)	(((x) & UART0LCRH_FEN_MASK) >> UART0LCRH_FEN_SHIFT)
+#define UART0LCRH_STP2_SHIFT	(3)
+#define UART0LCRH_STP2_MASK	(0x1u << UART0LCRH_STP2_SHIFT)
+#define UART0LCRH_STP2_SET(x)	(((x) << UART0LCRH_STP2_SHIFT) & UART0LCRH_STP2_MASK)
+#define UART0LCRH_STP2_GET(x)	(((x) & UART0LCRH_STP2_MASK) >> UART0LCRH_STP2_SHIFT)
+#define UART0LCRH_EPS_SHIFT	(2)
+#define UART0LCRH_EPS_MASK	(0x1u << UART0LCRH_EPS_SHIFT)
+#define UART0LCRH_EPS_SET(x)	(((x) << UART0LCRH_EPS_SHIFT) & UART0LCRH_EPS_MASK)
+#define UART0LCRH_EPS_GET(x)	(((x) & UART0LCRH_EPS_MASK) >> UART0LCRH_EPS_SHIFT)
+#define UART0LCRH_PEN_SHIFT	(1)
+#define UART0LCRH_PEN_MASK	(0x1u << UART0LCRH_PEN_SHIFT)
+#define UART0LCRH_PEN_SET(x)	(((x) << UART0LCRH_PEN_SHIFT) & UART0LCRH_PEN_MASK)
+#define UART0LCRH_PEN_GET(x)	(((x) & UART0LCRH_PEN_MASK) >> UART0LCRH_PEN_SHIFT)
+#define UART0LCRH_BRK_SHIFT	(0)
+#define UART0LCRH_BRK_MASK	(0x1u << UART0LCRH_BRK_SHIFT)
+#define UART0LCRH_BRK_SET(x)	(((x) << UART0LCRH_BRK_SHIFT) & UART0LCRH_BRK_MASK)
+#define UART0LCRH_BRK_GET(x)	(((x) & UART0LCRH_BRK_MASK) >> UART0LCRH_BRK_SHIFT)
+
+/* UART0CTL field accessors */
+#define UART0CTL_RXE_SHIFT	(9)
+#define UART0CTL_RXE_MASK	(0x1u << UART0CTL_RXE_SHIFT)
+#define UART0CTL_RXE_SET(x)	(((x) << UART0CTL_RXE_SHIFT) & UART0CTL_RXE_MASK)
+#define UART0CTL_RXE_GET(x)	(((x) & UART0CTL_RXE_MASK) >> UART0CTL_RXE_SHIFT)
+#define UART0CTL_TXE_SHIFT	(8)
+#define UART0CTL_TXE_MASK	(0x1u << UART0CTL_TXE_SHIFT)
+#define UART0CTL_TXE_SET(x)	(((x) << UART0CTL_TXE_SHIFT) & UART0CTL_TXE_MASK)
+#define UART0CTL_TXE_GET(x)	(((x) & UART0CTL_TXE_MASK) >> UART0CTL_TXE_SHIFT)
+#define UART0CTL_LBE_SHIFT	(7)
+#define UART0CTL_LBE_MASK	(0x1u << UART0CTL_LBE_SHIFT)
+#define UART0CTL_LBE_SET(x)	(((x) << UART0CTL_LBE_SHIFT) & UART0CTL_LBE_MASK)
+#define UART0CTL_LBE_GET(x)	(((x) & UART0CTL_LBE_MASK) >> UART0CTL_LBE_SHIFT)
+#define UART0CTL_SIRLP_SHIFT	(2)
+#define UART0CTL_SIRLP_MASK	(0x1u << UART0CTL_SIRLP_SHIFT)
+#define UART0CTL_SIRLP_SET(x)	(((x) << UART0CTL_SIRLP_SHIFT) & UART0CTL_SIRLP_MASK)
+#define UART0CTL_SIRLP_GET(x)	(((x) & UART0CTL_SIRLP_MASK) >> UART0CTL_SIRLP_SHIFT)
+#define UART0CTL_SIREN_SHIFT	(1)
+#define UART0CTL_SIREN_MASK	(0x1u << UART0CTL_SIREN_SHIFT)
+#define UART0CTL_SIREN_SET(x)	(((x) << UART0CTL_SIREN_SHIFT) & UART0CTL_SIREN_MASK)
+#define UART0CTL_SIREN_GET(x)	(((x) & UART0CTL_SIREN_MASK) >> UART0CTL_SIREN_SHIFT)
+#define UART0CTL_UARTEN_SHIFT	(0)
+#define UART0CTL_UARTEN_MASK	(0x1u << UART0CTL_UARTEN_SHIFT)
+#define UART0CTL_UARTEN_SET(x)	(((x) << UART0CTL_UARTEN_SHIFT) & UART0CTL_UARTEN_MASK)
+#define UART0CTL_UARTEN_GET(x)	(((x) & UART0CTL_UARTEN_MASK) >> UART0CTL_UARTEN_SHIFT)
+
+/*
+ * Initialize UART0.
+ */
+void __attribute__((section("privileged_functions"), noinline))
+UART0_Init(void)
+{
+	float brd = (float)SystemCoreClock / (16 * 115200);
+	uint32_t ibrd = (uint32_t)brd;
+	uint32_t fbrd = (uint32_t)((brd - ibrd) * 64 + 0.5);
+
+	/* Disable UART0 */
+	UART0CTL &= ~UART0CTL_UARTEN_SET(1);
+
+	/* Write IBRD */
+	UART0IBRD = UART0IBRD_DIVINT_SET(ibrd);
+
+	/* Write FBRD */
+	UART0FBRD = UART0FBRD_DIVFRAC_SET(fbrd);
+
+	/* Write line control */
+	UART0LCRH = UART0LCRH_SPS_SET(0) |
+		    UART0LCRH_WLEN_SET(0x3u) |
+		    UART0LCRH_FEN_SET(1) |
+		    UART0LCRH_STP2_SET(0) |
+		    UART0LCRH_EPS_SET(0) |
+		    UART0LCRH_PEN_SET(0) |
+		    UART0LCRH_BRK_SET(0);
+
+	/* Enable UART0 with TX and RX */
+	UART0CTL |= UART0CTL_RXE_SET(1) |
+		    UART0CTL_TXE_SET(1) |
+		    UART0CTL_UARTEN_SET(1);
+}
 
 /*
  * Low-level I/O routine called by _write() to output a character to an I/O
@@ -371,6 +505,9 @@ SysTick_GetTick(void)
 int
 __io_putchar(int ch)
 {
+	while (UART0FR_TXFF_GET(UART0FR)) {
+	}
+
 	UART0DR = UART0DR_DATA_SET(ch);
 	return ch;
 }
@@ -384,7 +521,15 @@ __io_putchar(int ch)
 int
 __io_getchar(void)
 {
-	char ch = UART0DR_DATA_GET(UART0DR);
+	char ch;
+
+	while (UART0FR_RXFE_GET(UART0FR)) {
+	}
+	ch = UART0DR_DATA_GET(UART0DR);
+
+	/* Echo it back */
+	__io_putchar(ch);
+
 	return ch;
 }
 
@@ -731,6 +876,9 @@ Init(void)
 
 	/* Initialize SysTick */
 	SysTick_Init();
+
+	/* Initialize UART0 */
+	UART0_Init();
 
 #ifdef SILHOUETTE
 	/* Initialize MPU */
