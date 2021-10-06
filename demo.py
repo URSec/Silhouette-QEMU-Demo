@@ -32,7 +32,7 @@ root = os.path.abspath(os.path.dirname(sys.argv[0]))
 #
 # Path to the build directory where we place the compiler and libraries.
 #
-build_dir = root + '/build'
+build_dir = os.path.join(root, 'build')
 
 #
 # List of configurations.
@@ -151,17 +151,22 @@ benchmarks = {
 #
 def build(config, benchmark, programs):
     # Make sure the compiler and libraries have been built
-    if not os.path.exists(build_dir + '/llvm/install/bin/clang'):
+    clang_path = os.path.join(build_dir, 'llvm', 'install', 'bin', 'clang')
+    if not os.path.exists(clang_path):
         print('The Silhouette compiler cannot be found')
-        print('Run \'' + build_dir + '/build.llvm.sh\' to build it')
+        print('Run \'' + os.path.join(build_dir, 'build.llvm.sh') + '\' to build it')
         exit(1)
-    if not os.path.exists(build_dir + '/newlib-' + config + '/install/arm-none-eabi/lib/libc.a'):
+    newlib_path = os.path.join(build_dir, 'newlib-' + config, 'install',
+                               'arm-none-eabi', 'lib', 'libc.a')
+    if not os.path.exists(newlib_path):
         print('Newlib for ' + config + ' cannot be found')
-        print('Run \'' + build_dir + '/build.newlib.sh\' to build it')
+        print('Run \'' + os.path.join(build_dir, 'build.newlib.sh') + '\' to build it')
         exit(1)
-    if not os.path.exists(build_dir + '/compiler-rt-' + config + '/install/lib/baremetal/libclang_rt.builtins-arm.a'):
+    crt_path = os.path.join(build_dir, 'compiler-rt-' + config, 'install',
+                            'lib', 'baremetal', 'libclang_rt.builtins-arm.a')
+    if not os.path.exists(crt_path):
         print('Compiler-rt for ' + config + ' cannot be found')
-        print('Run \'' + build_dir + '/build.compiler.rt.sh\' to build it')
+        print('Run \'' + os.path.join(build_dir, 'build.compiler.rt.sh') + '\' to build it')
         exit(1)
 
     # Make sure SCons is installed
@@ -171,16 +176,15 @@ def build(config, benchmark, programs):
 
     targets = []
     for p in programs:
-        targets += ['build-' + config + '/' + config + '-' + p + '.elf']
+        targets += [os.path.join('build-' + config, config + '-' + p + '.elf')]
     if len(targets) == 0:
         targets += ['build-' + config]
 
     process = subprocess.Popen(['scons'] + targets,
-                               cwd=root + '/projects/' + benchmark,
+                               cwd=os.path.join(root, 'projects', benchmark),
                                start_new_session=True)
     if process.wait() != 0:
         exit(1)
-
 
 
 #
@@ -196,7 +200,7 @@ def run(config, benchmark, programs):
     if len(programs) == 0:
         programs = benchmarks[benchmark]
     for p in programs:
-        targets += ['build-' + config + '/' + config + '-' + p + '.elf']
+        targets += [os.path.join('build-' + config, config + '-' + p + '.elf')]
 
     # Make sure QEMU and Screen are installed
     if not shutil.which('qemu-system-arm'):
@@ -208,7 +212,7 @@ def run(config, benchmark, programs):
 
     # Make sure the programs to run have been built
     for t in targets:
-        elf = root + '/projects/' + benchmark + '/' + t
+        elf = os.path.join(root, 'projects', benchmark, t)
         if not os.path.exists(elf):
             print(elf + ' cannot be found')
             print('Build it by \'' + ' '.join([sys.argv[0], 'build', config, benchmark]) + '\'')
@@ -239,7 +243,7 @@ def run(config, benchmark, programs):
             process = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
                                         '-L', '-Logfile', screenlog,
                                         '-c', screenrc],
-                                       cwd=root + '/projects/' + benchmark,
+                                       cwd=os.path.join(root, 'projects', benchmark),
                                        start_new_session=True)
             time.sleep(1)
 
@@ -256,7 +260,7 @@ def run(config, benchmark, programs):
             # Tell the Screen process to monitor the PTY
             process2 = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
                                          '-X', 'screen', pts],
-                                        cwd=root + '/projects/' + benchmark,
+                                        cwd=os.path.join(root, 'projects', benchmark),
                                         start_new_session=True)
             if process2.wait() != 0:
                 exit(1)
@@ -277,7 +281,7 @@ def debug(config, benchmark, programs):
     if len(programs) == 0:
         programs = benchmarks[benchmark]
     for p in programs:
-        targets += ['build-' + config + '/' + config + '-' + p + '.elf']
+        targets += [os.path.join('build-' + config, config + '-' + p + '.elf')]
 
     # Make sure QEMU, GDB, and Screen are installed
     if not shutil.which('qemu-system-arm'):
@@ -295,7 +299,7 @@ def debug(config, benchmark, programs):
 
     # Make sure the programs to debug have been built
     for t in targets:
-        elf = root + '/projects/' + benchmark + '/' + t
+        elf = os.path.join(root, 'projects', benchmark, t)
         if not os.path.exists(elf):
             print(elf + ' cannot be found')
             print('Build it by \'' + ' '.join([sys.argv[0], 'build', config, benchmark]) + '\'')
@@ -332,7 +336,7 @@ def debug(config, benchmark, programs):
             process = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
                                         '-L', '-Logfile', screenlog,
                                         '-c', screenrc],
-                                       cwd=root + '/projects/' + benchmark,
+                                       cwd=os.path.join(root, 'projects', benchmark),
                                        start_new_session=True)
             time.sleep(1)
 
@@ -349,7 +353,7 @@ def debug(config, benchmark, programs):
             # Tell the Screen process to monitor the PTY
             process2 = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
                                          '-X', 'screen', pts],
-                                        cwd=root + '/projects/' + benchmark,
+                                        cwd=os.path.join(root, 'projects', benchmark),
                                         start_new_session=True)
             if process2.wait() != 0:
                 exit(1)
