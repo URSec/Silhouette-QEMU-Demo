@@ -36,7 +36,8 @@ few assumptions and dependencies of the environment:
   so `cmake`, `ninja`, and `clang` of appropriate versions must be found in
   `PATH`.
 - We use the Silhouette compiler to build Newlib and compiler-rt, so make sure
-  that common development tools needed to build Newlib and compiler-rt (such as
+  that common development tools needed to build Newlib and compiler-rt for
+  bare-metal ARM environments (such as `arm-none-eabi-gcc` and
   `make`) are there in `PATH`.  In particular, one of our build scripts uses
   `arm-none-eabi-gcc` to find out where a bare-metal ARM `libgcc` is installed.
 - We use SCons to build programs, so make sure that `scons` of an appropriate
@@ -44,15 +45,16 @@ few assumptions and dependencies of the environment:
 - We use QEMU ARM emulator to run ELF binaries built for the Luminary Micro
   Stellaris LM3S6965EVB board, so `qemu-system-arm` of an appropriate version
   must be found in `PATH`.
+- We use GNU Screen for multiplexing the terminal screen with several processes
+  (such as a program's standard I/O and QEMU's monitor console), so `screen` of
+  an appropriate version must also be found in `PATH`.
 - We use GDB to debug ELF binaries and have debugging support included in one
   of our scripts.  If you would like to use our script for debugging, make sure
-  either `gdb-multiarch` or `arm-none-eabi-gdb` is there in `PATH`.  In
-  addition, the script uses GNU Screen to simultaneously run QEMU and GDB, so
-  `screen` of an appropriate version must also be found in `PATH`.
+  either `gdb-multiarch` or `arm-none-eabi-gdb` is there in `PATH`.
 
 Again, our [Docker image](#using-docker-image) meets every assumption and has
 every dependency pre-installed.  It is the recommended way to try out
-Silhouette on QEMU.
+Silhouette on QEMU if you are using an x86_64 machine.
 
 Following is the directory hierarchy of this repository:
 
