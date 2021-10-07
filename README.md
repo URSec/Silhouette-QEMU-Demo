@@ -158,45 +158,53 @@ you now need to quit both QEMU and GDB.
 
 ## What Do Test Programs Do
 
-Our test program suite contains four test programs that characterize different
-memory safety and control-flow hijacking attacks: `forward`, `backward`,
-`overflow`, and `rop`.  You can
-build them using either the baseline or Silhouette configuration and run them
-to examine their execution results with and without Silhouette's protections.
+Our test program suite contains three test programs that characterize different
+memory safety and control-flow hijacking attacks: `backward`, `forward`, and
+`overflow`.  For these programs, you can build them using either the baseline
+or Silhouette configuration and run them to examine their execution results
+with and without Silhouette's protections.  Specifically:
+- `backward` demonstrates how a backward-edge control flow transfer (i.e., a
+  function return) is hijacked to jump to the beginning of a function that does
+  not appear in the regular control flow graph.  In the baseline configuration,
+  it corrupts a return address saved on the stack to point to a function which
+  prints out a message indicating a successful attack.  The same attack under
+  the Silhouette configuration will no longer work, and you will see a message
+  printed out to indicate a failure, which is part of the original benign
+  control flow.
+- `forward` demonstrates how a forward-edge control flow transfer (i.e., an
+  indirect function call) is hijacked to jump to the middle of a function.
+  When built with the baseline configuration, it will jump to code that prints
+  out a message indicating a successful attack.  When it is built with the
+  Silhouette configuration, you will find that Silhouette's CFI instrumentation
+  detects a forward-edge corruption and clears all bits in the corrupted
+  function pointer; jumping to the address `0` then triggers a `UsageFault`
+  exception, whose handler will print out a message indicating a failed attack.
+- `overflow` demonstrates that a stack-based buffer overflow vulnerability may
+  write past the stack region and overwrite other memory regions.  In the
+  Silhouette configuration, it will try to corrupt the shadow stack region,
+  which is placed next to the stack region, and it will be captured as the
+  shadow stack is protected from writes initiated by unprivileged stores.
 
-`forward` demonstrates how a forward-edge control flow transfer (i.e., an
-indirect function call) is hijacked to jump to the middle of a function.  When
-built with the baseline configuration, it will jump to code that prints out a
-message indicating a successful attack.  When it is built with the Silhouette
-configuration, you will find that Silhouette's CFI instrumentation detects a
-forward-edge corruption and clears all bits in the corrupted function pointer;
-jumping to the address `0` then triggers a `UsageFault` exception, whose
-handler will print out a message indicating a failed attack.
+In addition, the test program suite also contains a benign program called
+`ditto`, which, in an infinite loop, reads a string from the standard input and
+prints it out to the standard output.  We include this program to demonstrate a
+Return-Oriented Programming (ROP) attack, in which an attacker hijacks the
+control flow by corrupting a return address on the stack and executing a chain
+of reusable code gadgets.  To do so,
+1. We first implant a buffer overflow vulnerability at
+   `projects/tests/src/ditto/main.c:57` by changing `sizeof(buf)` to a larger
+   value (e.g., 1024).
+2. With the now vulnerable program running (without Silhouette), we can type an
+   input string longer than the original `sizeof(buf)` to overwrite the stack.
+3. We provide a pre-crafted attack payload in
+   `projects/tests/src/ditto/payload.txt`, the binary format of which can be
+   fed to the program to print out a "hello world"-styled message in a ROP
+   manner.  The binary format can be obtained by
+   `xxd -r projects/tests/src/ditto/payload.txt`.
 
-`backward` demonstrates how a backward-edge control flow transfer (i.e., a
-function return) is hijacked to jump to the beginning of a function that does
-not appear in the regular control flow graph.  In the baseline configuration,
-it corrupts a return address saved on the stack to point to a function which
-prints out a message indicating a successful attack.  The same attack under the
-Silhouette configuration will no longer work, and you will see a message
-printed out to indicate a failure, which is part of the original benign control
-flow.
-
-`overflow` demonstrates that a stack-based buffer overflow vulnerability may
-write past the stack region and overwrite other memory regions.  In the
-Silhouette configuration, it will try to corrupt the shadow stack region, which
-is placed next to the stack region, and it will be captured as the shadow stack
-is protected from writes initiated by unprivileged stores.
-
-`rop` simulates a Return-Oriented Programming (ROP) attack, in which an
-attacker hijacks the control flow by corrupting a return address on the stack
-and executing a chain of reusable code gadgets.  In our program, we fabricated
-a buffer overflow vulnerability and crafted an attack payload to print out a
-"hello world"-styled message to the serial console.  The payload is hard-coded
-and is highly dependent on the generated code layout; therefore it is different
-across the baseline and Silhouette configurations.  Similar to that of
-`backward`, such a ROP attack under the Silhouette configuration will not work,
-and `rop`'s original control flow will be executed.
+Similar to that of `backward`, such a ROP attack under the Silhouette
+configuration will not work, and `ditto`'s original control flow will be
+executed despite the implanted vulnerability.
 
 ## How to Extend
 
