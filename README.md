@@ -141,19 +141,20 @@ were compiled using the Silhouette configuration.
 For `build`, the generated binaries, as well as intermediate object files, will
 be placed in the `projects/<BENCH>/build-<CONFIG>` directory.
 
-For `run`, the script will spawn a QEMU process for running each of the
-specified binaries.  You can quit QEMU at any point by
-<kbd>Ctrl</kbd>-<kbd>A</kbd> + <kbd>C</kbd> (which opens QEMU's monitor
-console) and then typing `quit`/`q`.
+For `run`, the script will create a session of two vertically stacked windows
+in GNU Screen for running each of the specified binaries in QEMU, where the
+upper window connects to the standard I/O of the binary and the lower window
+connects to QEMU's monitor console.  You can quit QEMU at any point by first
+switching the input focus to the lower window (<kbd>Ctrl</kbd>-<kbd>A</kbd> +
+<kbd>Tab</kbd>) and then typing `quit`/`q`; doing so will also terminate the
+GNU Screen session.
 
-For `debug`, what the script does is simply creating a debugging session of two
-side-by-side windows in GNU Screen (again, for each of the specified binaries),
-where the window on the left side runs QEMU and the window on the right side
-runs GDB.  You can switch between the two windows by
-<kbd>Ctrl</kbd>-<kbd>A</kbd> + <kbd>Tab</kbd>.  To open QEMU's monitor console,
-now you need to press <kbd>Ctrl</kbd>-<kbd>A</kbd> + <kbd>A</kbd> + <kbd>C</kbd>
-when the QEMU window has the input, as both QEMU and GNU Screen use
-<kbd>Ctrl</kbd>-<kbd>A</kbd> as their control character.
+For `debug`, the script will create a debugging session of three windows in GNU
+Screen (again, for each of the specified binaries), where the two vertically
+stacked windows on the left side do the same thing as in `run` and the third
+window on the right side runs GDB.  You can switch between the three windows by
+<kbd>Ctrl</kbd>-<kbd>A</kbd> + <kbd>Tab</kbd>.  To quit the GNU Screen session,
+you now need to quit both QEMU and GDB.
 
 ## What Do Test Programs Do
 
