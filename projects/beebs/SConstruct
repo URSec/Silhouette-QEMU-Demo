@@ -17,22 +17,22 @@ import os
 #
 # Path to the root directory of the repository.
 #
-root = '#/../..'
+root = os.path.join('#', '..', '..')
 
 #
 # Path to our Silhouette compiler.
 #
-clang = root + '/build/llvm/install/bin/clang'
+clang = os.path.join(root, 'build', 'llvm', 'install', 'bin', 'clang')
 
 #
 # Path to the newlib install directory.
 #
-newlib = root + '/build/newlib-${CONF_NAME}/install'
+newlib = os.path.join(root, 'build', 'newlib-${CONF_NAME}', 'install')
 
 #
 # Path to the compiler-rt install directory.
 #
-compiler_rt = root + '/build/compiler-rt-${CONF_NAME}/install'
+compiler_rt = os.path.join(root, 'build', 'compiler-rt-${CONF_NAME}', 'install')
 
 
 #
@@ -78,11 +78,11 @@ baseline.Append(LINKFLAGS=[
 baseline.Append(LIBS=['c', 'm', 'clang_rt.builtins-arm'])
 baseline.Append(CPPPATH=[
     Dir('#inc'),
-    Dir(newlib + '/arm-none-eabi/include'),
+    Dir(os.path.join(newlib, 'arm-none-eabi', 'include')),
 ])
 baseline.Append(LIBPATH=[
-    Dir(newlib + '/arm-none-eabi/lib'),
-    Dir(compiler_rt + '/lib/baremetal'),
+    Dir(os.path.join(newlib, 'arm-none-eabi', 'lib')),
+    Dir(os.path.join(compiler_rt, 'lib', 'baremetal')),
 ])
 
 
@@ -114,5 +114,6 @@ environments = [
 ###############################################################################
 
 for env in environments:
-    SConscript('src/programs.scons', variant_dir='build-' + env['CONF_NAME'],
+    SConscript(os.path.join('src', 'programs.scons'),
+               variant_dir='build-' + env['CONF_NAME'],
                duplicate=False, exports=['env'])
