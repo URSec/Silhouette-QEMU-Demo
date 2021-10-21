@@ -242,7 +242,7 @@ def run(config, benchmark, programs):
             # Spawn the Screen process
             process = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
                                         '-L', '-Logfile', screenlog,
-                                        '-c', screenrc],
+                                        '-c', screenrc, '-s', 'bash'],
                                        cwd=os.path.join(root, 'projects', benchmark),
                                        start_new_session=True)
             time.sleep(1)
@@ -335,7 +335,7 @@ def debug(config, benchmark, programs):
             # Spawn the Screen process
             process = subprocess.Popen(['screen', '-S', 'silhouette-qemu-demo',
                                         '-L', '-Logfile', screenlog,
-                                        '-c', screenrc],
+                                        '-c', screenrc, '-s', 'bash'],
                                        cwd=os.path.join(root, 'projects', benchmark),
                                        start_new_session=True)
             time.sleep(1)
