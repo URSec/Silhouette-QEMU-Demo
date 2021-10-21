@@ -96,9 +96,7 @@ silhouette.Append(CPPDEFINES=[
     'SILHOUETTE_SS_OFFSET=0x1ffc',
 ])
 silhouette.Append(LINKFLAGS=[
-    '-Wl,-mllvm,-enable-arm-silhouette-str2strt',
-    '-Wl,-mllvm,-enable-arm-silhouette-shadowstack',
-    '-Wl,-mllvm,-enable-arm-silhouette-cfi',
+    '-Wl,-mllvm,-enable-arm-silhouette',
     '-Wl,-mllvm,-arm-silhouette-shadowstack-offset=0x1ffc',
 ])
 
