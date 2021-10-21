@@ -143,9 +143,7 @@ configure() {
     if [ "$1" = "silhouette" ]; then
         CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET -DSILHOUETTE"
         CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET -DSILHOUETTE_SS_OFFSET=0x1ffc"
-        CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET -mllvm -enable-arm-silhouette-str2strt"
-        CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET -mllvm -enable-arm-silhouette-shadowstack"
-        CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET -mllvm -enable-arm-silhouette-cfi"
+        CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET -mllvm -enable-arm-silhouette"
         CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET -mllvm -arm-silhouette-shadowstack-offset=0x1ffc"
     fi
     export CFLAGS_FOR_TARGET
